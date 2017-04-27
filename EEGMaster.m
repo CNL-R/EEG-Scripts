@@ -4,9 +4,5 @@
 clear all;
 clc;
 rootdir = uigetdir;
-load('chanlocs32.mat');
-
+load('chanlocs256.mat');
 bdf2mat(rootdir,chanlocs);
-
-preprocdat(rootdir,chanlocs);
-
