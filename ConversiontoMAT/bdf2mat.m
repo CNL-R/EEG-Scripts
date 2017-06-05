@@ -10,7 +10,8 @@ for i = 1:length(subjects)
     bdffiles = ls(fullfile(datadir,subjects{i},[subjects{i},'_bdf'],'*bdf'));
     
     if ~isempty(bdffiles)
-        if isempty(ls(fullfile(datadir,subjects{i},[subjects{i},'_mat'],'*mat')));
+        if exist(fullfile(datadir,subjects{i},[subjects{i},'_mat']),'dir') == 0
+        %if isempty(ls(fullfile(datadir,subjects{i},[subjects{i},'_mat'],'*mat')))
             disp(['Converting and merging ' subjects{i}]);
             
             for j = 1:size(bdffiles,1)
