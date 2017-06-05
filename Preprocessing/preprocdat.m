@@ -2,7 +2,7 @@
 
 function preprocdat(datadir,chanlocs)
 
-load('chanlocs32.mat')
+load('chanlocs256.mat')
 
 trigs = {'3','5','7','9','11','13'};
 %trigs = {'21','22','23','24','25','26','27','28','29','30','31','32'};
