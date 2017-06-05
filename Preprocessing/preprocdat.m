@@ -47,8 +47,8 @@ subjects = {folders([folders(:).isdir]).name};
 subjects(ismember(subjects,{'.','..'})) = [];
 
 for i = 1:length(subjects)
-    
-    if isempty(ls(fullfile(datadir,subjects{i},[subjects{i},'_erp'],'*mat')));
+    if exist(fullfile(datadir,subjects{i},[subjects{i},'_erp']),'dir') == 0
+    %if isempty(ls(fullfile(datadir,subjects{i},[subjects{i},'_erp'],'*mat')));
         
         % Create new subject folder
         mkdir(fullfile(datadir,subjects{i},[subjects{i},'_erp']));
