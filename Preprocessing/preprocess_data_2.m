@@ -19,8 +19,8 @@ tmax = 900;
 thr1 = 150;
 thrMin = -100;
 thrMax = 500;
-blmin = -50;
-blmax = 10;
+blmin = -100;
+blmax = 0;
 
 % Define filter parameters
 FstopH = 1;
@@ -103,7 +103,7 @@ for i = 1:length(subjects)
     % Get reaction times
     RTs = cell(1,numel(trigs));
     for j = 1:numel(trigs)
-        RTs{j} = zeros(1,ERPs{j}.trials);
+       RTs{j} = zeros(1,ERPs{j}.trials);
         for k = 1:ERPs{j}.trials
             try
                 RTs{j}(k) = cell2mat(ERPs{j}.epoch(k).eventlatency(2));
@@ -113,7 +113,7 @@ for i = 1:length(subjects)
         end
     end
     
-    % Calculate average ERP
+    % Calculate average ERPh
     ERPavg = cell(numel(trigs));
     for j = 1:numel(trigs)
         ERPavg{j} = squeeze(mean(ERPs{j}.data,3));
