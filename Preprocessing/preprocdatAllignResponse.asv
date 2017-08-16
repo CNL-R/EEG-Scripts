@@ -4,7 +4,7 @@ function preprocdat(datadir,chanlocs)
 
 load('chanlocs256.mat')
 
-trigs = {'1','2','3','4','5','7','8','10','22','23','32','33','34','36','48','49','51','52','56','57','62','63'}; %PSM
+trigs = {'2','3','4','5','7','8','10','22','23','32','33','34','36','48','49','51','52','56','57','62','63'}; %PSM
 %trigs = {'3','5','7','9','11','13'};
 %trigs = {'21','22','23','24','25','26','27','28','29','30','31','32'};
 
@@ -14,6 +14,8 @@ fs = 512;
 nChans = 32;
 tmin = -100;
 tmax = 900;
+tminAR = -100;
+tmaxAR = 200; 
 thr1 = 150;
 thrMin = -100;
 thrMax = 500;
@@ -91,7 +93,8 @@ for i = 1:length(subjects)
         EEG = pop_reref(EEG,[],'exclude',257:size(EEG.data,1));
         
         maxVals = [];
-        ERPs = cell(numel(trigs),1);
+        ERPs = cell(2*numel(trigs),1);
+        ARindcs = cell(numel(trigs),1);
         for j = 1:numel(trigs)
             % Extract epochs for each condition
             ERPs{j} = pop_epoch(EEG,trigs(j),[tmin/1e3,tmax/1e3]);
@@ -99,6 +102,19 @@ for i = 1:length(subjects)
             % Calculate max/min values of epochs
             maxVals = [maxVals;squeeze(max(max(abs(ERPs{j}.data(1:nChans,1:308,:)))))];
         end
+        
+        %Extracting epochs from responses
+        for j = 1:numel(trigs)
+            %for each event in ERPs{trig}
+            for k = 2:numel(ERPs{j}.event(:))
+                %if the event is a response and the previous event is stimulus trig(j)
+                if ERPs{j}.event(k).type == 1 && ERPs{j}.event(k-1).type == str2num(cell2mat(trigs(j)))
+                    ARindcs{j} = [ARindcs{j} k];
+                end 
+            end
+            
+            ERPs{j + numel(trigs)} = pop_epoch(
+        end 
         
         % Get rid of outliers above threshold 1 (150 uV)
         maxVals(maxVals>thr1) = [];
@@ -137,7 +153,7 @@ for i = 1:length(subjects)
         % Save in MAT files
         disp('Saving data to mat file...');
         save(fullfile(datadir,subjects{i},[subjects{i},'_erp'],[subjects{i},'.mat']),'ERPs','ERPavg','RTs','t','fs','-mat');
-        clear files EEG ERPs maxVals thr2 RTs ERPavg t fs
+        %clear files EEG ERPs maxVals thr2 RTs ERPavg t fs
         
     end
 end

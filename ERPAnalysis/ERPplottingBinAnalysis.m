@@ -41,29 +41,35 @@ end
 bin1indxs = [1 4 6 7 10 11 12 13 15 16]; %participant indeces. Ordered based on numerical order. 
 ERPavg1 = ERPavg(bin1indxs, :, :, :);
 erpPlot1 = squeeze(mean(ERPavg1,1));
+erpErr1 = squeeze(std(ERPavg1,1))/sqrt(numel(bin1indxs));
 
 
 % Bin #2 A-A < V-A
 bin2indxs = [2 4 6 7 8 9 10 11 12 16];
 ERPavg2 = ERPavg(bin2indxs, :, :, :);
 erpPlot2 = squeeze(mean(ERPavg2, 1));
+erpErr2 = squeeze(std(ERPavg2,1))/sqrt(numel(bin2indxs));
 
 
 % Bin #3 V-V = A-V
 bin3indxs = [5 14];
 ERPavg3 = ERPavg(bin3indxs, :, :, :);
 erpPlot3 = squeeze(mean(ERPavg3, 1));
+erpErr3 = squeeze(std(ERPavg3,1))/sqrt(numel(bin3indxs));
 
 
 % Bin #4 A-A = V-A
 bin4indxs = [1 3 5 15];
 ERPavg4 = ERPavg(bin4indxs, :, :, :);
 erpPlot4 = squeeze(mean(ERPavg4, 1));
+erpErr4 = squeeze(std(ERPavg4,1))/sqrt(numel(bin4indxs));
+
 
 % Bin #A 2 people from V-V < V-A
 binAindxs = [1 4];
 ERPavgA = ERPavg(binAindxs, :, :, :);
 erpPlotA = squeeze(mean(ERPavgA, 1));
+erpErrA = squeeze(std(ERPavgA,1))/sqrt(numel(binAindxs));
 %% Plot function A - New figure for each channel, n-conditions on plot.
 trange = [-50 300];
 
@@ -403,7 +409,7 @@ end
  text(335,0,strjoin(condsLegend(1)),'color','blue','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
  text(335,.3,strjoin(condsLegend(3)),'color','yellow','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
  text(335,.6,strjoin(condsLegend(4)),'color','magenta','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
- %% Plot function #3.3 - many channels on a figure. All Indivs, Bin1, Bin3, n-conditions on plot. Loops to create many figures
+ %% Plot function #3.3 - intrabin. many channels on a figure. All Indivs, Bin1, Bin3, n-conditions on plot. Loops to create many figures
 
 Outdir = uigetdir('C:\Users\achen52\Documents\SMART\bins\Outputs\','Select Output Directory for the Graphs!'); 
  
@@ -413,7 +419,6 @@ trange = [-50 350];
 
 numberSets = 9;
 electrodes = {'A7','A6','A24';'A8','A23','A25';'A9','A22','A26';'A10','A21','A27';'A11','A20','A28';'A12','A19','A29';'A13','A18','A30';'A14','A17','A31';'A15','A16','A32'};
-
 for i = 1:size(electrodes, 2)
     for j = 1:size(electrodes, 1)
         es(j,i) = find(strcmp(electrodes{j,i},chans));
@@ -485,7 +490,90 @@ for Set = 1:numberSets
     savefig(Hfig, strcat(Outdir,'\VisualBins_',strjoin(electrodes(Set,:),'_'),'.fig'));
     saveas(Hfig, strcat(Outdir,'\VisualBins_',strjoin(electrodes(Set,:),'_'),'.png'));
 end
+ %% Plot function #3.3E - intrabin. many channels on a figure. All Indivs, Bin1, Bin3, n-conditions on plot. Loops to create many figures. E - Includes SEM shadow
 
+Outdir = uigetdir('C:\Users\achen52\Documents\SMART\bins\Outputs\','Select Output Directory for the Graphs!'); 
+ 
+bin1Title = 'Individuals With Statistically Significant Visual Switch Costs';
+bin3Title = 'Individuals With No Visual Switch Costs';
+trange = [-50 350];
+
+%numberSets = 9;
+numberSets = 10;
+%electrodes = {'A7','A6','A24';'A8','A23','A25';'A9','A22','A26';'A10','A21','A27';'A11','A20','A28';'A12','A19','A29';'A13','A18','A30';'A14','A17','A31';'A15','A16','A32'};
+electrodes = {'E28','E12','E11';'E27','E13','E10';'E26','E14','E9';'E25','E15','E8';'E24','E16','E7';'E23','E17','E6';'E22','E18','E19';'F3','E21','E20';'E3','F2','E1';'E2','F1','D1'};
+for i = 1:size(electrodes, 2)
+    for j = 1:size(electrodes, 1)
+        es(j,i) = find(strcmp(electrodes{j,i},chans));
+    end
+end
+
+%conds = [7 9 8 2];
+conds = [7 9];
+condsLegend = {'V-V', 'A-V'};
+
+for Set = 1:numberSets
+    Hfig = figure;
+    for i = 1:size(electrodes,2)
+        %ys = [min(min(min(erpPlot(conds,es(i),52:308))))-0.5 max(max(max(erpPlot(conds,es(i),52:308))))+0.5];
+        ys = [-5 5.5];
+        subplot(size(electrodes,2),3,3*(i-1) + 1)
+        plot([0,0],ys,'--k '); hold on;
+        plot(trange,[0 0],'--k');
+        for j = 1:length(conds)
+            patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(Set,i),:)+erpErr(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot(conds(j),es(Set,i),:)-erpErr(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+            plot(t,squeeze(erpPlot(conds(j),es(Set,i),:)),'LineWidth',2);
+        end
+        
+        text(mean(trange),ys(2),electrodes{Set, i},'horizontalalignment','center','verticalalignment','top','fontweight','bold')
+        
+        set(gca,'ylim',ys,'xlim',trange)
+        title('All Individuals');   
+    end
+    
+    for i = 1:size(electrodes,2)
+        %ys = [min(min(min(erpPlot(conds,es(i),52:308))))-0.5 max(max(max(erpPlot(conds,es(i),52:308))))+0.5];
+        ys = [-5 5.5];
+        subplot(size(electrodes,2),3,3*(i-1) + 2)
+        plot([0,0],ys,'--k '); hold on;
+        plot(trange,[0 0],'--k');
+        for j = 1:length(conds)
+            patch([t fliplr(t)],[squeeze(erpPlot1(conds(j),es(Set,i),:)+erpErr1(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot1(conds(j),es(Set,i),:)-erpErr1(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+            plot(t,squeeze(erpPlot1(conds(j),es(Set,i),:)),'LineWidth',2);
+        end
+        
+        text(mean(trange),ys(2),electrodes{Set, i},'horizontalalignment','center','verticalalignment','top','fontweight','bold')
+        
+        set(gca,'ylim',ys,'xlim',trange)
+        title(bin1Title);
+        
+    end
+    
+    for i = 1:size(electrodes,2)
+        %ys = [min(min(min(erpPlot(conds,es(i),52:308))))-0.5 max(max(max(erpPlot(conds,es(i),52:308))))+0.5];
+        ys = [-5 5.5];
+        subplot(size(electrodes,2),3,3*(i-1) + 3)
+        plot([0,0],ys,'--k '); hold on;
+        plot(trange,[0 0],'--k');
+        for j = 1:length(conds)
+            patch([t fliplr(t)],[squeeze(erpPlot3(conds(j),es(Set,i),:)+erpErr3(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot3(conds(j),es(Set,i),:)-erpErr3(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+            plot(t,squeeze(erpPlot3(conds(j),es(Set,i),:)),'LineWidth',2);
+        end
+        
+        text(mean(trange),ys(2),electrodes{Set, i},'horizontalalignment','center','verticalalignment','top','fontweight','bold')
+        
+        set(gca,'ylim',ys,'xlim',trange)
+        title(bin3Title);
+        
+    end
+    text(400,14,strjoin(condsLegend(2)),'color','red','horizontalalignment','left','verticalalignment','top','FontSize',8','fontweight','bold');
+    text(400,15,strjoin(condsLegend(1)),'color','blue','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    %text(400,13,strjoin(condsLegend(3)),'color','yellow','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    %text(400,16,strjoin(condsLegend(4)),'color','magenta','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    set(gcf, 'Position', [0, 0, 1920, 1080]);
+    savefig(Hfig, strcat(Outdir,'\VisualBins_SEM',strjoin(electrodes(Set,:),'_'),'.fig'));
+    saveas(Hfig, strcat(Outdir,'\VisualBins_SEM',strjoin(electrodes(Set,:),'_'),'.png'));
+end
  %% Plot function #3.4 - One channel on a figure. All Individuals, bin 1 & bin3. n subplots for n conditions 
 trange = [-50 300];
 
@@ -514,7 +602,57 @@ for Set = 1:numberSets
             plot([0,0],ys,'--k '); hold on;
             plot(trange,[0 0],'--k');
             for j = 1:1
-                %patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(i),:)+erpErr(conds(j),es(i),:))' fliplr(squeeze(erpPlot(conds(j),es(i),:)-erpErr(conds(j),es(i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                %patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(Set,i),:)+erpErr(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot(conds(j),es(Set,i),:)-erpErr(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                plot(t,squeeze(erpPlot(conds(condIndx),es(Set,i),:)),'LineWidth',2);
+                plot(t,squeeze(erpPlot1(conds(condIndx),es(Set,i),:)),'LineWidth',2);
+                plot(t,squeeze(erpPlot3(conds(condIndx),es(Set,i),:)),'LineWidth',2);
+            end
+            
+            text(mean(trange),ys(2),electrodes{Set,i},'horizontalalignment','center','verticalalignment','top','fontweight','bold')
+            
+            set(gca,'ylim',ys,'xlim',trange)
+            title(condTitle);
+        end
+    end
+    set(gcf, 'Position', [0, 0, 1920, 1080]);
+    text(305,15,strjoin(subplotLegend(2)),'color','red','horizontalalignment','left','verticalalignment','top','FontSize',8','fontweight','bold');
+    text(305,16,strjoin(subplotLegend(1)),'color','blue','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    text(305,14,strjoin(subplotLegend(3)),'color','yellow','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    %text(400,16,strjoin(condsLegend(4)),'color','magenta','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    savefig(Hfig, strcat(Outdir,'\VisualBins_intracond_',strjoin(electrodes(Set,:),'_'),'.fig'));
+    saveas(Hfig, strcat(Outdir,'\VisualBins_intracond_',strjoin(electrodes(Set,:),'_'),'.png'));
+end
+%% Plot function #3.4E - Many channels on a figure. All Individuals, bin 1 & bin3. n subplots for n conditions 
+trange = [-50 300];
+
+Outdir = uigetdir('C:\Users\achen52\Documents\SMART\bins\Outputs\','Select Output Directory for the Graphs!'); 
+
+numberSets = 9;
+electrodes = {'A7','A6','A24';'A8','A23','A25';'A9','A22','A26';'A10','A21','A27';'A11','A20','A28';'A12','A19','A29';'A13','A18','A30';'A14','A17','A31';'A15','A16','A32'};
+for i = 1:size(electrodes, 2)
+    for j = 1:size(electrodes, 1)
+        es(j,i) = find(strcmp(electrodes{j,i},chans));
+    end
+end
+
+conds = [7 9 8];
+condsLegend = {'V-V', 'A-V', 'AV-V'};
+subplotLegend = {'All Individuals','Significant Visual Switch Costs', 'No Visual Switch Costs'};
+for Set = 1:numberSets
+    Hfig = figure;
+    for i = 1:size(electrodes,2)       
+        for condIndx = 1:length(conds)
+            condTitle = strjoin(condsLegend(condIndx));
+            %ys = [min(min(min(erpPlot(conds,es(i),52:308))))-0.5 max(max(max(erpPlot(conds,es(i),52:308))))+0.5];
+            ys = [-5 5.5];
+            %subplot(1,length(conds),condIndx);
+            subplot(size(electrodes,2), length(conds), 3 *(i-1) + condIndx)
+            plot([0,0],ys,'--k '); hold on;
+            plot(trange,[0 0],'--k');
+            for j = 1:1
+                patch([t fliplr(t)],[squeeze(erpPlot(conds(condIndx),es(Set,i),:)+erpErr(conds(condIndx),es(Set,i),:))' fliplr(squeeze(erpPlot(conds(condIndx),es(Set,i),:)-erpErr(conds(condIndx),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                patch([t fliplr(t)],[squeeze(erpPlot1(conds(condIndx),es(Set,i),:)+erpErr1(conds(condIndx),es(Set,i),:))' fliplr(squeeze(erpPlot1(conds(condIndx),es(Set,i),:)-erpErr1(conds(condIndx),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                patch([t fliplr(t)],[squeeze(erpPlot3(conds(condIndx),es(Set,i),:)+erpErr3(conds(condIndx),es(Set,i),:))' fliplr(squeeze(erpPlot3(conds(condIndx),es(Set,i),:)-erpErr3(conds(condIndx),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
                 plot(t,squeeze(erpPlot(conds(condIndx),es(Set,i),:)),'LineWidth',2);
                 plot(t,squeeze(erpPlot1(conds(condIndx),es(Set,i),:)),'LineWidth',2);
                 plot(t,squeeze(erpPlot3(conds(condIndx),es(Set,i),:)),'LineWidth',2);
@@ -666,17 +804,20 @@ bin1Title = 'Individuals With Statistically Significant Auditory Switch Costs';
 bin3Title = 'Individuals With No Auditory Switch Costs';
 trange = [-50 350];
 
-numberSets = 9;
-electrodes = {'D23','D11','D10';'D22','D12','D9';'D21','D13','D8';'D20','D14','D7';'D19','D15','D6';'D18','D16','C28';'D17','D5','C27';'C32','C31','C30';'C29','C22','C23'};
-
+%numberSets = 9;
+numberSets = 10;
+%electrodes = {'D23','D11','D10';'D22','D12','D9';'D21','D13','D8';'D20','D14','D7';'D19','D15','D6';'D18','D16','C28';'D17','D5','C27';'C32','C31','C30';'C29','C22','C23'};
+electrodes = {'E28','E12','E11';'E27','E13','E10';'E26','E14','E9';'E25','E15','E8';'E24','E16','E7';'E23','E17','E6';'E22','E18','E19';'F3','E21','E20';'E3','F2','E1';'E2','F1','D1'};
 for i = 1:size(electrodes, 2)
     for j = 1:size(electrodes, 1)
         es(j,i) = find(strcmp(electrodes{j,i},chans));
     end
 end
 
-conds = [6 4 5 1];
-condsLegend = {'A-A', 'V-A', 'AV-A', 'Pure A'};
+%conds = [6 4 5 1];
+conds = [6 4];
+condsLegend = {'A-A', 'V-A'};
+%condsLegend = {'A-A', 'V-A', 'AV-A', 'Pure A'};
 
 for Set = 1:numberSets
     Hfig = figure;
@@ -687,7 +828,7 @@ for Set = 1:numberSets
         plot([0,0],ys,'--k '); hold on;
         plot(trange,[0 0],'--k');
         for j = 1:length(conds)
-            %patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(i),:)+erpErr(conds(j),es(i),:))' fliplr(squeeze(erpPlot(conds(j),es(i),:)-erpErr(conds(j),es(i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+            patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(Set,i),:)+erpErr(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot(conds(j),es(Set,i),:)-erpErr(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
             plot(t,squeeze(erpPlot(conds(j),es(Set,i),:)),'LineWidth',2);
         end
         
@@ -704,7 +845,7 @@ for Set = 1:numberSets
         plot([0,0],ys,'--k '); hold on;
         plot(trange,[0 0],'--k');
         for j = 1:length(conds)
-            %patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(i),:)+erpErr(conds(j),es(i),:))' fliplr(squeeze(erpPlot(conds(j),es(i),:)-erpErr(conds(j),es(i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+            patch([t fliplr(t)],[squeeze(erpPlot2(conds(j),es(Set,i),:)+erpErr2(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot2(conds(j),es(Set,i),:)-erpErr2(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
             plot(t,squeeze(erpPlot2(conds(j),es(Set,i),:)),'LineWidth',2);
         end
         
@@ -722,7 +863,7 @@ for Set = 1:numberSets
         plot([0,0],ys,'--k '); hold on;
         plot(trange,[0 0],'--k');
         for j = 1:length(conds)
-            %patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(i),:)+erpErr(conds(j),es(i),:))' fliplr(squeeze(erpPlot(conds(j),es(i),:)-erpErr(conds(j),es(i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+            patch([t fliplr(t)],[squeeze(erpPlot4(conds(j),es(Set,i),:)+erpErr4(conds(j),es(Set,i),:))' fliplr(squeeze(erpPlot4(conds(j),es(Set,i),:)-erpErr4(conds(j),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
             plot(t,squeeze(erpPlot4(conds(j),es(Set,i),:)),'LineWidth',2);
         end
         
@@ -734,8 +875,8 @@ for Set = 1:numberSets
     end
     text(400,14,strjoin(condsLegend(2)),'color','red','horizontalalignment','left','verticalalignment','top','FontSize',8','fontweight','bold');
     text(400,15,strjoin(condsLegend(1)),'color','blue','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
-    text(400,13,strjoin(condsLegend(3)),'color','yellow','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
-    text(400,16,strjoin(condsLegend(4)),'color','magenta','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    %text(400,13,strjoin(condsLegend(3)),'color','yellow','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
+    %text(400,16,strjoin(condsLegend(4)),'color','magenta','horizontalalignment','left','verticalalignment','top','FontSize',8,'fontweight','bold')
     set(gcf, 'Position', [0, 0, 1920, 1080]);
     savefig(Hfig, strcat(Outdir,'\AuditoryBins_',strjoin(electrodes(Set,:),'_'),'.fig'));
     saveas(Hfig, strcat(Outdir,'\AuditoryBins_',strjoin(electrodes(Set,:),'_'),'.png'));
@@ -769,7 +910,9 @@ for Set = 1:numberSets
             plot([0,0],ys,'--k '); hold on;
             plot(trange,[0 0],'--k');
             for j = 1:1
-                %patch([t fliplr(t)],[squeeze(erpPlot(conds(j),es(i),:)+erpErr(conds(j),es(i),:))' fliplr(squeeze(erpPlot(conds(j),es(i),:)-erpErr(conds(j),es(i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                patch([t fliplr(t)],[squeeze(erpPlot(conds(condIndx),es(Set,i),:)+erpErr(conds(condIndx),es(Set,i),:))' fliplr(squeeze(erpPlot(conds(condIndx),es(Set,i),:)-erpErr(conds(condIndx),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                patch([t fliplr(t)],[squeeze(erpPlot2(conds(condIndx),es(Set,i),:)+erpErr2(conds(condIndx),es(Set,i),:))' fliplr(squeeze(erpPlot2(conds(condIndx),es(Set,i),:)-erpErr2(conds(condIndx),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
+                patch([t fliplr(t)],[squeeze(erpPlot4(conds(condIndx),es(Set,i),:)+erpErr4(conds(condIndx),es(Set,i),:))' fliplr(squeeze(erpPlot4(conds(condIndx),es(Set,i),:)-erpErr4(conds(condIndx),es(Set,i),:))')],[0.8 0.8 0.8],'FaceAlpha',0.2);
                 plot(t,squeeze(erpPlot(conds(condIndx),es(Set,i),:)),'LineWidth',2);
                 plot(t,squeeze(erpPlot2(conds(condIndx),es(Set,i),:)),'LineWidth',2);
                 plot(t,squeeze(erpPlot4(conds(condIndx),es(Set,i),:)),'LineWidth',2);

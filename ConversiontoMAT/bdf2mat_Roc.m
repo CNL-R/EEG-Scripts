@@ -2,7 +2,7 @@
 %clear all;
 %clc;
 
-%load('chanlocs256.mat')  %move into loop? Script auto select chanloc file after reading in data?
+load('chanlocs256.mat')  %move into loop? Script auto select chanloc file after reading in data?
 
 datadir = uigetdir;
 

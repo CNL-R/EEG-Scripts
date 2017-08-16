@@ -25,7 +25,7 @@ for i = 1:size(id,2)
     ERPavg(i,17,:,:)=ERPavg(i,13,:,:)-ERPavg(i,3,:,:); %pure difference wave for (A+V)-AV
     ERPavg(i,18,:,:)=ERPavg(i,14,:,:)-ERPavg(i,11,:,:); %repeat difference wave for (A+V)-AV
     ERPavg(i,19,:,:)=ERPavg(i,15,:,:)-ERPavg(i,16,:,:); %switch difference wave for (A+V)-AV 
-    clear ERPs RTs
+    %clear ERPs RTs
     
 end
 
@@ -77,21 +77,19 @@ end
 %ys = [min(min(min(erpPlot(:,es,52:308)))) max(max(max(erpPlot(:,es,52:308))))];
 ys = [-5 5.5];
 
-%xsize = 0.18;
-%ysize = 0.14;
+
 xsize = 0.12; %changes dimension of each individual plot
 ysize = 0.10;
 ncols = 7;
 nrows = 7;
-colstart = 0.015;
-%colstart = 0.03;
+colstart = 0.015; %leftmost bit of ehspace
 cols = [colstart (1/ncols)+colstart (2/ncols)+colstart (3/ncols)+colstart (4/ncols)+colstart (5/ncols)+colstart (6/ncols)+colstart];
 rowstart = 0.02;
 rows = [rowstart (1/nrows)+rowstart (2/nrows)+rowstart (3/nrows)+rowstart (4/nrows)+rowstart (5/nrows)+rowstart (6/nrows)+rowstart];
 
 scrsz = get(groot,'screensize');
 figz = figure('Position',[scrsz(3)/20 scrsz(4)/20 scrsz(3)/1.2 scrsz(4)/1.2],'Name','AV Pure(b) Repeat(r) Switch(y)','NumberTitle','off'); 
-chan1_ax = axes(figz,'Position',[cols(1) rows(7) xsize ysize]); hold on;
+chan1_ax = axes(figz,'Position',[cols(1) rows(7) xsize ysize]); hold on; %note how ordering works out
 chan2_ax = axes(figz,'Position',[cols(2) rows(7) xsize ysize]); hold on;
 chan3_ax = axes(figz,'Position',[cols(3) rows(7) xsize ysize]); hold on;
 chan4_ax = axes(figz,'Position',[cols(4) rows(7) xsize ysize]);hold on;
