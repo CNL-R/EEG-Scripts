@@ -8,4 +8,4 @@ load('chanlocs256.mat');
 
 bdf2mat(rootdir,chanlocs);
 
-preprocdat(rootdir,chanlocs);
+preprocdat(rootdir,chanlocs)
