@@ -13,7 +13,7 @@ trigs = {'1','11','12','13','21','22','23','31','32','33'};
 % Define ERP parameters %THESE SHOULD BE DETERMINED FROM DATA STRUCT OR
 % USER SHOULD BE PROMPTED
 fs = 512;
-nChans = 32;
+nChans = 256;
 tmin = -100;
 tmax = 900;
 thr1 = 150;
@@ -38,7 +38,7 @@ h = fdesign.lowpass(FpassL,FstopL,Apass,AstopL,fs);
 lpf = design(h,'cheby2','MatchExactly','stopband'); clear h
 
 % Find 6 nearest channels to each channel
-[~,nearMat] = getnearest('chanlocs128.txt',nChans,6);
+[~,nearMat] = getnearest('chanlocs256.txt',nChans,6);
 nearCell = cell(1,nChans);
 for i = 1:nChans
     nearCell{i} = nearMat(i,:);
